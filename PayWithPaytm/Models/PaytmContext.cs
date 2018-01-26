@@ -11,6 +11,7 @@ namespace PayWithPaytm.Models
         public PaytmContext() : base("PaytmDBConnection")
         {
             Database.SetInitializer<PaytmContext>(new CreateDatabaseIfNotExists<PaytmContext>());
+            Database.SetInitializer<PaytmContext>(new DropCreateDatabaseIfModelChanges<PaytmContext>());
         }
 
         public DbSet<PaytmPayment> PaytmPayments { get; set; }

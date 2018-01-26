@@ -22,6 +22,9 @@ namespace PayWithPaytm.Controllers
         public ActionResult Index()
         {
             var model = new PaytmPayment();
+            model.Name = "SomeName";
+            model.Email = "email@example.com";
+            model.Phone = "7777777777";
             return View(model);
         }
 
@@ -31,6 +34,8 @@ namespace PayWithPaytm.Controllers
             if(ModelState.IsValid)
             {
                 model.ClientIP = Request.UserHostAddress;
+                model.TimeStampInitiated = DateTime.Now;
+                model.OrderId = DateTime.Now.ToString("MMyyyyMMddhhmmss");
                 context.PaytmPayments.Add(model);
                 context.SaveChanges();
                 string paymentPage = payment.CreateRequest(model);
@@ -46,18 +51,32 @@ namespace PayWithPaytm.Controllers
             {
                 parameters.Add(key.Trim(), Request.Form[key].Trim());
             }
-            bool isPaymentSuccess = payment.IsPaymentSuccess(parameters);
+            string paytmChecksum = "";
+            bool isPaymentSuccess = payment.IsPaymentSuccess(parameters,out paytmChecksum);
 
             if (isPaymentSuccess)
             {
-                int orderId = Convert.ToInt32(Request.Form["ORDERID"].Trim());
-                var model = context.PaytmPayments.Find(orderId);
+                string orderId = Request.Form["ORDERID"].Trim();
+                var model = context.PaytmPayments.Where(m=>m.OrderId==orderId).FirstOrDefault();
                 model.Paid = true;
+                model.CheckSum = paytmChecksum;
+                model.TimeStampSuccess = DateTime.Now;
                 context.SaveChanges();
-                return Content("payment successfull");
+                return Redirect("Reciept?Id=" + model.OrderId);
             }
 
-            return Content("payment failed");
+            return RedirectToAction("Failed");
+        }
+
+        public ActionResult Reciept(string Id)
+        {
+            var model = context.PaytmPayments.Where(m => m.OrderId == Id).FirstOrDefault();
+            return View(model);
+        }
+
+        public ActionResult Failed()
+        {            
+            return View();
         }
     }
 }

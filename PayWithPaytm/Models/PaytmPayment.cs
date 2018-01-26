@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
@@ -10,11 +11,11 @@ namespace PayWithPaytm.Models
     {
         public PaytmPayment()
         {
-            Amount = 1;
+            Amount = 10;
             Country = "India";
         }
         public int Id { get; set; }
-        [Required]
+        public string OrderId { get; set; }
         public string Name { get; set; }
         [Required]
         public string Email { get; set; }
@@ -26,8 +27,12 @@ namespace PayWithPaytm.Models
         public string PostalCode { get; set; }
         public string Country { get; set; }
         [Required]
+        [ReadOnly(true)]
         public double Amount { get; set; }
         public string ClientIP { get; set; }
         public bool Paid { get; set; }
+        public string CheckSum { get; set; }
+        public DateTime? TimeStampInitiated { get; set; }
+        public DateTime? TimeStampSuccess { get; set; }
     }
 }

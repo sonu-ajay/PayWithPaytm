@@ -20,7 +20,7 @@ namespace PayWithPaytm.Services
             parameters.Add("EMAIL", model.Email);
             parameters.Add("MOBILE_NO", model.Phone);
             parameters.Add("CUST_ID", model.Id.ToString());
-            parameters.Add("ORDER_ID", model.Id.ToString());
+            parameters.Add("ORDER_ID", model.OrderId.ToString());
             parameters.Add("TXN_AMOUNT", model.Amount.ToString());
             parameters.Add("CALLBACK_URL", GetConfig.Get("CALLBACK_URL")); //This parameter is not mandatory. Use this to pass the callback url dynamically.
 
@@ -53,21 +53,21 @@ namespace PayWithPaytm.Services
             return outputHTML;
         }
 
-        public bool IsPaymentSuccess(Dictionary<string, string> parameters)
+        public bool IsPaymentSuccess(Dictionary<string, string> parameters,out string paytmChecksum)
         {
             bool isPaymentSuccess = false;
 
             String merchantKey = GetConfig.Get("Merchant_KEY"); // Replace the with the Merchant Key provided by Paytm at the time of registration.
 
-            string paytmChecksum = "";
+            paytmChecksum = "";
 
             if (parameters.ContainsKey("CHECKSUMHASH"))
             {
-                paytmChecksum = parameters["CHECKSUMHASH"];
+                paytmChecksum = parameters["CHECKSUMHASH"];                
                 parameters.Remove("CHECKSUMHASH");
             }
 
-            if (CheckSum.verifyCheckSum(merchantKey, parameters, paytmChecksum))
+            if (CheckSum.verifyCheckSum(merchantKey, parameters, paytmChecksum) && parameters["STATUS"]== "TXN_SUCCESS")
                 isPaymentSuccess = true;
 
             return isPaymentSuccess;
