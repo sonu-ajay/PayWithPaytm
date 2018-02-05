@@ -1,6 +1,6 @@
 # PayWithPaytm
 
-To use this project I am using stagin url of Paytm. <br/>
+To use this project I am using staging url of Paytm. <br/>
 You can add your MID(Merchant ID) and Merchant Key in the Web.Config File and you are good to go.<br/>
 Below is the sample of the Configs.
 ```
